@@ -11,7 +11,6 @@ class Base(metaclass=ABCMeta):
         :param name:
         :return: 返回keys的list
         """
-        return
 
     @abstractmethod
     def values(self, name):
@@ -20,7 +19,6 @@ class Base(metaclass=ABCMeta):
         :param name:
         :return: 返回values的list
         """
-        return
 
     @abstractmethod
     def length(self, name):
@@ -29,7 +27,6 @@ class Base(metaclass=ABCMeta):
         :param name:
         :return: 返回元素数量
         """
-        return
 
     @abstractmethod
     def get(self, name, key):
@@ -39,7 +36,6 @@ class Base(metaclass=ABCMeta):
         :param key:
         :return: value object
         """
-        return
 
     @abstractmethod
     def m_get(self, name, keys):
@@ -49,7 +45,6 @@ class Base(metaclass=ABCMeta):
         :param keys:
         :return: 返回顺序与keys相同的value的list
         """
-        return
 
     @abstractmethod
     def get_all(self, name):
@@ -58,7 +53,6 @@ class Base(metaclass=ABCMeta):
         :param name:
         :return: 返回kv的dict
         """
-        return
 
     @abstractmethod
     def set(self, name, key, value):
@@ -69,7 +63,6 @@ class Base(metaclass=ABCMeta):
         :param value: 值
         :return: 成功返回1，失败返回0
         """
-        return
 
     @abstractmethod
     def m_set(self, name, mapping):
@@ -77,19 +70,17 @@ class Base(metaclass=ABCMeta):
         将“mapping” dict中的kv持久化
         :param name:
         :param mapping:
-        :return:
+        :return: 成功返回True，失败返回False
         """
-        return
 
     @abstractmethod
-    def delete(self, name, keys):
+    def delete(self, name, *keys):
         """
         从持久化介质删除keys list 中的key
         :param name:
         :param keys:
         :return: 成功返回1，失败返回0
         """
-        return
 
     @abstractmethod
     def exist(self, name, key):
@@ -99,4 +90,11 @@ class Base(metaclass=ABCMeta):
         :param key:
         :return: 存在返回True，不存在返回False
         """
-        return
+
+    @abstractmethod
+    def delete_collection(self, *names):
+        """
+        删除整个实体
+        :param names:
+        :return:
+        """

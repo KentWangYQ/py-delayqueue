@@ -9,8 +9,8 @@ from config import settings
 class RedisClient(Base):
     def __init__(self):
         self.__name = ''
-        self.__client = redis.Redis(host=settings.REDIS.get('host'), port=setting.REDIS.get('port'),
-                                    db=settings.REDIS.get('db'))
+        self.__client = redis.Redis(host=settings.REDIS.get('host'), port=settings.REDIS.get('port'),
+                                    db=settings.REDIS.get('db'), decode_responses=True)
 
     def keys(self, name):
         return self.__client.hkeys(name)
@@ -36,8 +36,11 @@ class RedisClient(Base):
     def m_set(self, name, mapping):
         return self.__client.hmset(name, mapping)
 
-    def delete(self, name, keys):
-        return self.__client.hdel(name, keys)
+    def delete(self, name, *keys):
+        return self.__client.hdel(name, *keys)
 
     def exist(self, name, key):
         return self.__client.hexists(name, key)
+
+    def delete_collection(self, *names):
+        return self.__client.delete(*names)

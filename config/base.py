@@ -6,6 +6,8 @@ class Config(object):
     TESTING = False
     KAFKA = {
         'hosts': [
+            '172.16.1.2:9092',
+            '172.16.1.3:9092'
         ],
         'topic_prefix': 'dq_538cf_',  # 'delayqueue'做sha256取后五位
         'client_id': 'delay_queue'
@@ -18,4 +20,7 @@ class Config(object):
     }
     REDIS_KEY = {
         'delay_queue': 'delay_queue'
+    }
+    PERSIST = {
+        'client': 'redis'
     }

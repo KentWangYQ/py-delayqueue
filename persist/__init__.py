@@ -7,4 +7,4 @@ __clients = {
     'redis': RedisClient
 }
 
-PersistClient = [settings.PERSIST.get('client') or 'redis']
+PersistClient = __clients[settings.PERSIST.get('client') or 'redis']

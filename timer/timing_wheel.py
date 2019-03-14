@@ -1,21 +1,30 @@
 # coding: utf-8
 
-from datetime import datetime
+import json
 
+from common import time_util
 from .timer_task_list import TimerTaskList
 
 
-# TODO 持久化time_now
 class TimingWheel(object):
     """
     时间轮
     """
+
     # 高阶时间轮
     overflow_wheel = None  # TimingWheel
     # 轮槽
     buckets = []
 
-    def __init__(self, tick_ms=1000, wheel_size=100, start_ms=datetime.now()):
+    @property
+    def current_time(self):
+        return self._current_time
+
+    @current_time.setter
+    def current_time(self, value):
+        self._current_time = value
+
+    def __init__(self, tick_ms=1000, wheel_size=100, start_ms=time_util.utc_now_timestamp_ms()):
         """
         初始化时间轮
         :param tick_ms:
@@ -31,9 +40,17 @@ class TimingWheel(object):
         # 总体时间跨度，整数，单位：ms
         self.interval = self.tick_ms * self.wheel_size  # Type: int
         # 表盘指针，当前时间，tick_ms的整数倍
-        self.current_time = 0  # Type: int
+        self._current_time = 0  # Type: int
         # 初始化轮槽
         self.buckets = [TimerTaskList() for _ in range(self.wheel_size)]  # Type: [TimerTaskList]
+
+    def __repr__(self):
+        return json.dumps({
+            'start_ms': self.start_ms,
+            'tick_ms': self.tick_ms,
+            'wheel_size': self.wheel_size,
+            'current_time': self.current_time
+        })
 
     def add(self, timer_task_entry):
         """

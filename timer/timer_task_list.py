@@ -40,7 +40,7 @@ class TimerTaskList(object):
         '''
         链表root为哨兵，不包含任务，便于处理边界
         '''
-        self.root = TimerTaskEntry(expiration=None, task=None)
+        self.root = TimerTaskEntry(expiration=None, task=None, persist=False)
         self.root.prev = self.root
         self.root.next = self.root
         self.expiration = expiration
