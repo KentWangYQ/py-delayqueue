@@ -1,4 +1,12 @@
-# coding: utf-8
+# -*- coding: utf-8 -*-
+
+import json
+import uuid
+
+from persist import PersistClient
+
+_persist_client = PersistClient()
+_persist_name = 'timer_task_entry'
 
 
 class TimerTaskEntry(object):
@@ -19,11 +27,36 @@ class TimerTaskEntry(object):
         :param args:
         :param kwargs:
         """
+        self.uuid = uuid.uuid1()
         self.expiration = expiration  # 过期时间
-        self.task = task  # 任务
+        self.__task = task  # 任务
         self.args = args
         self.kwargs = kwargs
         self.cancelled = False  # 任务取消
+
+        _persist_client.set(_persist_name, self.uuid, self.__repr__())
+
+    def __repr__(self):
+        """
+        序列化对象
+        :return:
+        """
+        return json.dumps({'uuid': self.uuid,
+                           'expiration': self.expiration,
+                           'args': self.args,
+                           'kwargs': self.kwargs})
+
+    def run(self, *args, **kwargs):
+        """
+        运行task
+        :param args:
+        :param kwargs:
+        :return:
+        """
+        # 运行task
+        self.__task(*args, **kwargs)
+        # task成功执行后，删除持久化数据
+        _persist_client.delete(_persist_name, (self.uuid,))
 
     def cancel(self):
         """
@@ -31,3 +64,5 @@ class TimerTaskEntry(object):
         :return:
         """
         self.cancelled = True
+        # 任务成功取消后，删除持久化数据
+        _persist_client.delete(_persist_name, (self.uuid,))

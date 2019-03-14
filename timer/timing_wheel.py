@@ -5,6 +5,7 @@ from datetime import datetime
 from .timer_task_list import TimerTaskList
 
 
+# TODO 持久化time_now
 class TimingWheel(object):
     """
     时间轮
@@ -45,7 +46,7 @@ class TimingWheel(object):
             任务已过期
             '''
             # 执行task
-            timer_task_entry.task(*timer_task_entry.args, **timer_task_entry.kwargs)
+            timer_task_entry.run(*timer_task_entry.args, **timer_task_entry.kwargs)
             return None, False
         elif timer_task_entry.expiration < self.current_time + self.interval:
             '''
