@@ -24,7 +24,7 @@ class TimerTest(unittest.TestCase):
         timer = Timer(wheel_size=5)
         keys = [0, 0.1, 0.3, 0.8, 1, 2, 3, 4, 5, 8, 9, 10, 18, 24, 26, 30]
         for key in keys:
-            timer.add(TimerTaskEntry(expiration=key * 1000, task=self._print, key=key))
+            timer.add(TimerTaskEntry(delay=key * 1000, task=self._print, key=key))
 
         time.sleep(keys[-1])
         timer.shutdown()

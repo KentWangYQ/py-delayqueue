@@ -37,12 +37,9 @@ class Timer(object):
         :return:
         """
         # 获取timing_wheel的持久化数据
-        start_ms, tick_ms, wheel_size, current_time = map(lambda v: int(v) if v else None,
-                                                          self.__persist_client.m_get(TW_PERSIST_NAME,
-                                                                                      ['start_ms', 'tick_ms',
-                                                                                       'wheel_size',
-                                                                                       'current_time']))
-        if start_ms is None or tick_ms is None or wheel_size is None or current_time is None:
+        tick_ms, wheel_size = map(lambda v: int(v) if v else None,
+                                  self.__persist_client.m_get(TW_PERSIST_NAME, ['tick_ms', 'wheel_size']))
+        if tick_ms is None or wheel_size is None:
             # 未找到TimingWheel持久化数据，退出恢复过程。
             print('Recover: Do NOT find TimingWheel persist data!')
             return
@@ -61,8 +58,6 @@ class Timer(object):
         # 恢复timer_tasks
         for entry in timer_tasks.values():
             obj = json.loads(entry)
-            # 计算新的expiration
-            obj['expiration'] = max(obj.get('created') + (obj.get('expiration') or 0) - self.timing_wheel.start_ms, 0)
             # 重新向timer注册task
             self.add(TimerTaskEntry(expiration=obj.get('expiration'), task=task, guid=obj.get('guid'), *obj.get('args'),
                                     **obj.get('kwargs')))
@@ -73,7 +68,6 @@ class Timer(object):
         :return:
         """
         result = self.__persist_client.m_set(TW_PERSIST_NAME, {
-            'start_ms': self.timing_wheel.start_ms,
             'tick_ms': self.timing_wheel.tick_ms,
             'wheel_size': self.timing_wheel.wheel_size,
             'current_time': self.timing_wheel.current_time
@@ -91,7 +85,8 @@ class Timer(object):
             bucket, expiration_updated = self.timing_wheel.add(timer_task_entry)
             if bucket and expiration_updated:
                 # 任务列表过期时间更新，向延时队列注册任务列表
-                self.delay_queue.offer(bucket.expiration - self.timing_wheel.current_time, self.advance_clock, bucket)
+                self.delay_queue.offer(bucket.get_expiration() - time_util.utc_now_timestamp_ms(), self.advance_clock,
+                                       bucket)
 
     def advance_clock(self, bucket):
         """
@@ -102,7 +97,7 @@ class Timer(object):
         """
         if bucket:
             # 推进时间轮
-            self.timing_wheel.advance_clock(time_ms=bucket.expiration)
+            self.timing_wheel.advance_clock(time_ms=bucket.get_expiration())
             # 刷新任务列表
             bucket.flush(self.add)
 

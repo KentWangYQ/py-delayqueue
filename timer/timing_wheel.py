@@ -31,8 +31,6 @@ class TimingWheel(object):
         :param wheel_size:
         :param start_ms:
         """
-        # 开始时间，时间戳
-        self.start_ms = start_ms  # Type: timestamp
         # 基本时间跨度，整数，单位：ms
         self.tick_ms = tick_ms  # Type: int
         # 时间轮容量(格数)
@@ -40,13 +38,12 @@ class TimingWheel(object):
         # 总体时间跨度，整数，单位：ms
         self.interval = self.tick_ms * self.wheel_size  # Type: int
         # 表盘指针，当前时间，tick_ms的整数倍
-        self._current_time = 0  # Type: int
+        self._current_time = start_ms - start_ms % self.tick_ms  # Type: int
         # 初始化轮槽
         self.buckets = [TimerTaskList() for _ in range(self.wheel_size)]  # Type: [TimerTaskList]
 
     def __repr__(self):
         return json.dumps({
-            'start_ms': self.start_ms,
             'tick_ms': self.tick_ms,
             'wheel_size': self.wheel_size,
             'current_time': self.current_time
@@ -96,7 +93,8 @@ class TimingWheel(object):
         :return:
         """
         if not self.overflow_wheel:
-            self.overflow_wheel = TimingWheel(tick_ms=self.interval, wheel_size=self.wheel_size, start_ms=self.start_ms)
+            self.overflow_wheel = TimingWheel(tick_ms=self.interval, wheel_size=self.wheel_size,
+                                              start_ms=self.current_time)
 
     def advance_clock(self, time_ms):
         """

@@ -28,7 +28,7 @@ def main():
     def on_message(message):
         print('Receive delay task!')
         timer.add(
-            TimerTaskEntry(expiration=(_.get(message, 'value.delay') or 0), task=on_expired, message=message.value))
+            TimerTaskEntry(delay=(_.get(message, 'value.delay') or 0), task=on_expired, message=message.value))
 
     # 恢复上一次停机前状态
     timer.recover(task=on_expired)

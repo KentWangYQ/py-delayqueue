@@ -38,7 +38,7 @@ class Consumer(KafkaConsumer):
     def __init__(self):
         self.__event_emitter = EventEmitter()
         super().__init__(
-            'dq_538cf_test2',
+            # 'dq_538cf_test2',
             bootstrap_servers=settings.KAFKA.get('hosts'),
             client_id=settings.KAFKA.get('client_id'),
             group_id=self.topic_prefix,
@@ -47,7 +47,7 @@ class Consumer(KafkaConsumer):
             enable_auto_commit=True,
             auto_offset_reset='latest',
             session_timeout_ms=30000)
-        # self.subscribe(pattern=('^%s*' % self.topic_prefix))
+        self.subscribe(pattern=('^%s*' % self.topic_prefix))
 
     def tail(self):
         while True:

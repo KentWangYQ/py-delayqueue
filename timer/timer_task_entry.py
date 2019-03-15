@@ -25,7 +25,7 @@ class TimerTaskEntry(object):
     # 后继任务
     next = None
 
-    def __init__(self, expiration, task, guid=str(uuid.uuid1()), persist=True, *args, **kwargs):
+    def __init__(self, task, expiration=None, delay=None, guid=str(uuid.uuid1()), persist=True, *args, **kwargs):
         """
         初始化延时任务
         :param expiration: 过期时间
@@ -34,8 +34,16 @@ class TimerTaskEntry(object):
         :param kwargs:
         """
         self._guid = guid
-        self.expiration = expiration  # 过期时间
-        self.__created = time_util.utc_now_timestamp_ms()  # 任务创建时间，用于持久化恢复
+        # 过期时间
+        if expiration:
+            # 直接指定过期时间优先
+            self.expiration = expiration
+        elif delay:
+            # 指定延迟时间，换算为过期时间
+            self.expiration = time_util.utc_now_timestamp_ms() + delay
+        else:
+            # 两者均未指定，默认为当前时间
+            self.expiration = time_util.utc_now_timestamp_ms()
         self.__task = task  # 任务
         self.args = args
         self.kwargs = kwargs
@@ -51,7 +59,6 @@ class TimerTaskEntry(object):
         """
         return json.dumps({'guid': self.guid,
                            'expiration': self.expiration,
-                           'created': self.__created,
                            'args': self.args,
                            'kwargs': self.kwargs})
 
