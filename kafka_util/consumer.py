@@ -38,10 +38,9 @@ class Consumer(KafkaConsumer):
     def __init__(self):
         self.__event_emitter = EventEmitter()
         super().__init__(
-            # 'dq_538cf_test2',
             bootstrap_servers=settings.KAFKA.get('hosts'),
             client_id=settings.KAFKA.get('client_id'),
-            group_id=self.topic_prefix,
+            group_id=settings.KAFKA.get('delay_queue_group'),
             # key_deserializer=lambda m: loads(m.decode('utf-8')),
             value_deserializer=lambda m: loads(m.decode('utf-8')),
             enable_auto_commit=True,
